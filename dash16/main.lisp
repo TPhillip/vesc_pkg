@@ -87,6 +87,8 @@
 
 ; 0 nothing        1 next page      2 previous page   3 drive mode up
 ; 4 drive mode down 5 lights        6 cruise control  7 reverse
+; 8 horn            9 start/stop log 10 neutral        11 left indicator 
+; 12 right indicator
 (defun btn-do-action (a)
     (cond
         ((= a 1) (setq page-now (mod (+ page-now 1) page-num)))
@@ -99,6 +101,8 @@
         ((= a 8) (comm-send-event 0))
         ((= a 9) (comm-send-event 2)) ; start or stop logging on the controller
         ((= a 10) (if (< (abs stats-kmh) reverse-max-kmh) (mode-set 0)))
+        ((= a 11) (progn (setq indicate-l-on (not indicate-l-on)) (setq indicate-r-on nil))) ;toggle left indicator
+        ((= a 12) (progn (setq indicate-r-on (not indicate-r-on)) (setq indicate-l-on nil))) ;toggle right indicator
         (t nil)
 ))
 
@@ -331,6 +335,9 @@
 
         (def on-btn-0-long-pressed (fn () (btn-do-action (ix btn-actions-long 0))))
         (def on-btn-1-long-pressed (fn () (btn-do-action (ix btn-actions-long 1))))
+
+        (def on-btn-0-double-pressed (fn () (btn-do-action 11))) ; left indicator
+        (def on-btn-1-double-pressed (fn () (btn-do-action 12))) ; right indicator
 
         (def on-btn-0-repeat-press nil)
         (def on-btn-1-repeat-press nil)

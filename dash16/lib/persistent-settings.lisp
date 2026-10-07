@@ -182,9 +182,9 @@
         (setq drive-mode-num (setting-clamp (read-setting 'drive-modes) 1 5 5))
         (setq settings-esc-mode (setting-clamp (read-setting 'esc-mode) 0 2 0))
         (setq settings-esc-id (setting-clamp (read-setting 'esc-id) 0 253 0))
-        (setq btn-actions-short (map (fn (n) (setting-clamp (read-setting n) 0 10 0))
+        (setq btn-actions-short (map (fn (n) (setting-clamp (read-setting n) 0 12 0))
                 '(btn0-short btn1-short)))
-        (setq btn-actions-long (map (fn (n) (setting-clamp (read-setting n) 0 10 0))
+        (setq btn-actions-long (map (fn (n) (setting-clamp (read-setting n) 0 12 0))
                 '(btn0-long btn1-long)))
         (setq settings-icon-mask (setting-clamp (read-setting 'icon-mask) 0 0x3F 0x3F))
         (setq settings-bl-bright (setting-clamp (read-setting 'bl-bright) 0.1 1.0 bl-lvl-bright))
@@ -233,6 +233,9 @@
 (defun bl-preview (v) (pwm-set-duty (setting-clamp v 0.1 1.0 settings-bl-bright) 0))
 
 (defun settings-set (name val) {
+        ; Debug: log the setting update as it is applied.
+        (print (list 'settings-set name val))
+        
         (write-setting name val)
         (settings-load)
         (bl-apply)

@@ -23,6 +23,9 @@
         (def on-btn-0-pressed nil)
         (def on-btn-1-pressed nil)
 
+        (def on-btn-0-double-pressed nil)
+        (def on-btn-1-double-pressed nil)
+
         (def on-btn-0-long-pressed nil)
         (def on-btn-1-long-pressed nil)
 
@@ -36,6 +39,12 @@
         (var btn-1 0)
         (var btn-0-start (systime))
         (var btn-1-start (systime))
+        (var btn-0-last-release 0.0)
+        (var btn-1-last-release 0.0)
+        (var btn-0-single-press-pending nil)
+        (var btn-1-single-press-pending nil)
+        (var btn-0-single-press-time 0.0)
+        (var btn-1-single-press-time 0.0)
         (var btn-0-long-fired nil)
         (var btn-1-long-fired nil)
 
@@ -49,12 +58,45 @@
                 (var new-btn-1 (= (gpio-read 10) 0))
 
                 ; buttons are pressed on release
-                (if (and (>= btn-0 input-debounce-count) (not new-btn-0) (not btn-0-long-fired))
-                    (maybe-call (on-btn-0-pressed))
-                )
-                (if (and (>= btn-1 input-debounce-count) (not new-btn-1) (not btn-1-long-fired))
-                    (maybe-call (on-btn-1-pressed))
-                )
+                (if (and (>= btn-0 input-debounce-count) (not new-btn-0) (not btn-0-long-fired)) {
+                        (if (<= (secs-since btn-0-last-release) 0.25)
+                            {
+                                (setq btn-0-single-press-pending nil)
+                                (maybe-call (on-btn-0-double-pressed))
+                            }
+                            {
+                                ; not inside the double-press window, so wait .25sec before firing the single-press event.
+                                ; another button press will cancel the single-press event and fire the double-press event instead.
+                                (setq btn-0-last-release (systime))
+                                (setq btn-0-single-press-pending true)
+                                (setq btn-0-single-press-time (systime))
+                            }
+                        )
+                })
+                (if (and (>= btn-1 input-debounce-count) (not new-btn-1) (not btn-1-long-fired)) {
+                        (if (<= (secs-since btn-1-last-release) 0.25)
+                            {
+                                (setq btn-1-single-press-pending nil)
+                                (maybe-call (on-btn-1-double-pressed))
+                            }
+                            {
+                                ; not inside the double-press window, so wait .25sec before firing the single-press event.
+                                ; another button press will cancel the single-press event and fire the double-press event instead.
+                                (setq btn-1-last-release (systime))
+                                (setq btn-1-single-press-pending true)
+                                (setq btn-1-single-press-time (systime))
+                            }
+                        )
+                })
+
+                (if (and btn-0-single-press-pending (>= (secs-since btn-0-single-press-time) 0.25)) {
+                        (setq btn-0-single-press-pending nil)
+                        (maybe-call (on-btn-0-pressed))
+                })
+                (if (and btn-1-single-press-pending (>= (secs-since btn-1-single-press-time) 0.25)) {
+                        (setq btn-1-single-press-pending nil)
+                        (maybe-call (on-btn-1-pressed))
+                })
 
                 (setq btn-0 (if new-btn-0 (+ btn-0 1) 0))
                 (setq btn-1 (if new-btn-1 (+ btn-1 1) 0))

@@ -30,9 +30,9 @@ Item {
     property var actionNames: [
         "Nothing", "Next page", "Previous page",
         "Drive mode up", "Drive mode down", "Lights", "Cruise control",
-        "Toggle logging", "Reverse (at a stop)"
+        "Toggle logging", "Reverse (at a stop)", "Left indicator", "Right indicator"
     ]
-    property var actionCodes: [0, 1, 2, 4, 5, 6, 8, 9, 10]
+    property var actionCodes: [0, 1, 2, 4, 5, 6, 8, 9, 10, 11, 12]
 
     function actionIndex(code) {
         var ix = actionCodes.indexOf(code)

@@ -2,9 +2,23 @@
 (read-eval-program code-server)
 
 (def light-on 0)
+(def indicate-l-on 0)
+(def indicate-r-on 0)
 (def drive-mode 1)
 (def val-brk 0.0)
 (def volts-brk 0.0)
+
+(def light-can-id 205)
+(def brake-can-id 206)
+
+(def buf-light (array-create 8))
+(def buf-brake (array-create 8))
+
+(def last-light-state -1)
+(def last-indicate-l-state -1)
+(def last-indicate-r-state -1)
+(def last-brake-state -1)
+
 
 ; 2 is buttons only, 3 is buttons and ADC. Initially only
 ; the buttons are detached, but once throttle is received
@@ -68,6 +82,50 @@
     0x63 0x6f 0x00 0x68 0x98 0x47 0x00 0x28 0xf7 0xd0 0xa3 0x6a 0x28 0x68 0x98 0x47 0xd4 0xf8 0x4c 0x32
     0xd0 0xe9 0x00 0x10 0x00 0x22 0x98 0x47 0xd4 0xf8 0x8c 0x00 0xed 0xe7 0x00 0xbf 0x00 0xf8 0x00 0x10
 ])
+
+(defun send-light-state ()
+    (let ((state light-on)
+          (l-state indicate-l-on)
+          (r-state indicate-r-on))
+        (if (or (!= state last-light-state)
+                (!= l-state last-indicate-l-state)
+                (!= r-state last-indicate-r-state))
+            (progn
+                (setq last-light-state state)
+                (setq last-indicate-l-state l-state)
+                (setq last-indicate-r-state r-state)
+                (bufclear buf-light)
+                (bufset-u8 buf-light 0 state)
+                (bufset-u8 buf-light 1 l-state) ;left signal on
+                (bufset-u8 buf-light 2 r-state) ;right signal on
+                (can-send-sid light-can-id buf-light)
+            )
+        )
+    )
+)
+
+(defun brake-active-p ()
+    (or
+        ;(> val-brk 0.05)     ; primary brake input
+        ; add additional brake sources here as needed:
+        ; (> val-brk-2 0.05)
+        ; (= brake-switch 1)
+        (< (get-current 1) -0.05) ; optional regen / decel condition
+    )
+)
+
+(defun send-brake-state ()
+    (let ((state (if (brake-active-p) 1 0)))
+        (if (!= state last-brake-state)
+            (progn
+                (setq last-brake-state state)
+                (bufclear buf-brake)
+                (bufset-u8 buf-brake 0 state)
+                (can-send-sid brake-can-id buf-brake)
+            )
+        )
+    )
+)
 
 (defun set-profile (i-min i-max s-min s-max) {
         ; Every drive-mode frame from the display lands here, ten times a
@@ -200,6 +258,8 @@
                     (setq display-ts (systime))
                     (var drive-mode-new (bufget-u8 data 0))
                     (setq light-on (bufget-u8 data 1))
+                    (setq indicate-l-on (bufget-u8 data 2))
+                    (setq indicate-r-on (bufget-u8 data 3))
 
                     ; A second display that has not caught up yet keeps sending
                     ; the previous mode for a frame or two. Hold a new mode
@@ -274,16 +334,7 @@
                         })
                     )
 
-                    (if (= light-on 1)
-                        {
-                            (set-aux 1 1)
-                            (set-aux 2 1)
-                        }
-                        {
-                            (set-aux 1 0)
-                            (set-aux 2 0)
-                        }
-                    )
+                    (send-light-state)
             })
 
             ((= id 203) {
@@ -293,6 +344,7 @@
                     (setq adc-detach-mode 3)
                     (app-adc-override 1 volts-brk)
                     (app-adc-detach adc-detach-mode 3) ; Detach ADC2
+                    (send-brake-state)
             })
 
             ; Event
