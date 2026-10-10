@@ -21,7 +21,7 @@
 (def colors-dim-icon (colors-make-aa 0x000000 (color-make 0.2 0.2 0.2) 4))
 (def colors-white-icon (colors-make-aa 0x000000 0xfbfcfc 4))
 (def colors-purple-icon (colors-make-aa 0x000000 0xFCB614 4))
-(def colors-yellow-icon (colors-make-aa 0x000000 0xFFD400 4))
+(def colors-amber-icon (colors-make-aa 0x000000 0xFC8C14 4))
 
 ; Battery bar segments are indexed2
 (def colors-ok-2 (colors-make-aa 0x000000 0x00C321 2))

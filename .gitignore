@@ -21,3 +21,8 @@ blacktip_dpv/.git_branch_cache
 .DS_Store
 **/.DS_Store
 **/.vscode/
+dash_esc/README-gen.md
+dash16/ui.qml
+dash16/version.lisp
+dash16/README_Disp-gen.md
+vl_link_status/README.md

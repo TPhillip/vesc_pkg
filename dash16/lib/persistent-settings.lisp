@@ -13,9 +13,10 @@
 ; 0 discovers the lowest recently seen CAN id.
 (def settings-esc-id 0)
 
-; Action ids for short and long press, indexed by button. dash16 has two.
+; Action ids for short, long and double press, indexed by button. dash16 has two.
 (def btn-actions-short (list 4 5))
 (def btn-actions-long (list 1 8))
+(def btn-actions-double (list 11 12))
 
 ; Sources for the four readings on the live page. Index into slot-catalog.
 ; Changing the catalog order breaks saved settings.
@@ -79,6 +80,9 @@
     (splash-en . (30 i))
     (lever-min . (28 f))
     (lever-max . (29 f))
+    
+    (btn0-double . (31 i))
+    (btn1-double . (32 i))
 ))
 
 (defun print-settings ()
@@ -136,6 +140,8 @@
         (write-setting 'btn1-short 5)
         (write-setting 'btn0-long 1)
         (write-setting 'btn1-long 8)
+        (write-setting 'btn0-double 11)
+        (write-setting 'btn1-double 12)
 
         ; Conservative starting profiles. Reverse and the first mode are slow
         ; on purpose, since a wrong guess here moves the bike.
@@ -186,6 +192,8 @@
                 '(btn0-short btn1-short)))
         (setq btn-actions-long (map (fn (n) (setting-clamp (read-setting n) 0 12 0))
                 '(btn0-long btn1-long)))
+        (setq btn-actions-double (map (fn (n) (setting-clamp (read-setting n) 0 12 0))
+                '(btn0-double btn1-double)))
         (setq settings-icon-mask (setting-clamp (read-setting 'icon-mask) 0 0x3F 0x3F))
         (setq settings-bl-bright (setting-clamp (read-setting 'bl-bright) 0.1 1.0 bl-lvl-bright))
         (setq settings-batt-ramp (setting-flag 'batt-ramp false))
@@ -273,6 +281,8 @@
             (str-from-n settings-lever-min "%.3f ")
             (str-from-n settings-lever-max "%.3f ")
             (str-from-n (if settings-splash 1 0) "%d")
+            (str-from-n (ix btn-actions-double 0) "%d ")
+            (str-from-n (ix btn-actions-double 1) "%d ")
 )))
 
 ; Polled by the settings page while the lever section is open

@@ -27,6 +27,7 @@
 
 (def cruise-on 0)
 (def cruise-ts 0)
+(def brake-lever 0)
 
 (def battery-a-charging false)
 (def battery-a-chg-time 0.0)
@@ -253,7 +254,7 @@
                     (setq battery-a-chg-time (bufget-u16 data 3))
                     (setq stats-battery-ah (/ (bufget-u16 data 5) 10.0))
             })
-
+            
             ((= id 201) {
                     (setq display-ts (systime))
                     (var drive-mode-new (bufget-u8 data 0))
@@ -402,6 +403,19 @@
                                 )
                         })
                     )
+            })
+
+            ((= id 40) {
+                (cond
+                        ((= (bufget-u8 data 0) 1) { ; Brake Lever Pressed
+                                (setq cruise-on 0)
+                                (setq brake-lever 1)
+                                (app-adc-override 3 cruise-on)
+                        })
+                        ((= (bufget-u8 data 0) 0) { ; Brake Lever Released
+                                (setq brake-lever 0)
+                        })
+                )
             })
         )
 })
@@ -891,6 +905,16 @@
                 (can-send-sid 25 buf-can)
 
                 (sleep 0.1)
+        })
+
+        (loopwhile-thd ("Brake Lever" 150) t {
+                (if (= brake-lever 1) {
+                    ;preserve braking
+                    (app-adc-override 1 volts-brk);
+                    (app-adc-override 0 0)
+                    (app-adc-detach adc-detach-mode 1)
+                })
+                (sleep 0.001)
         })
 
         (loopwhile-thd ("Cruise" 150) t {

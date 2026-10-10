@@ -336,8 +336,8 @@
         (def on-btn-0-long-pressed (fn () (btn-do-action (ix btn-actions-long 0))))
         (def on-btn-1-long-pressed (fn () (btn-do-action (ix btn-actions-long 1))))
 
-        (def on-btn-0-double-pressed (fn () (btn-do-action 11))) ; left indicator
-        (def on-btn-1-double-pressed (fn () (btn-do-action 12))) ; right indicator
+        (def on-btn-0-double-pressed (fn () (btn-do-action (ix btn-actions-double 0)))) 
+        (def on-btn-1-double-pressed (fn () (btn-do-action (ix btn-actions-double 1))))
 
         (def on-btn-0-repeat-press nil)
         (def on-btn-1-repeat-press nil)

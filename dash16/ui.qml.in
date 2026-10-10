@@ -138,7 +138,7 @@ Item {
             }
             if (!str.startsWith("cfg ")) { return }
             var v = str.trim().split(" ")
-            if (v.length < 22) { return }
+            if (v.length < 24) { return }
 
             loading = true
             speedMetric.checked = parseInt(v[1]) === 1
@@ -158,6 +158,7 @@ Item {
             for (var b = 0; b < 2; b++) {
                 btnRepeater.itemAt(b).shortIndex = actionIndex(parseInt(v[8 + b]))
                 btnRepeater.itemAt(b).longIndex = actionIndex(parseInt(v[10 + b]))
+                btnRepeater.itemAt(b).doubleIndex = actionIndex(parseInt(v[23 + b]))
             }
             for (var sl = 0; sl < 4; sl++) {
                 slotRepeater.itemAt(sl).source = parseInt(v[12 + sl])
@@ -669,6 +670,7 @@ Item {
                         property int btnIndex: index
                         property alias shortIndex: shortBox.currentIndex
                         property alias longIndex: longBox.currentIndex
+                        property alias doubleIndex: doubleBox.currentIndex
                         Layout.fillWidth: true
                         Layout.bottomMargin: 4
 
@@ -716,6 +718,28 @@ Item {
                                 onActivated: {
                                     if (!loading) {
                                         setSetting("btn" + btnIndex + "-long",
+                                                   actionCodes[currentIndex])
+                                    }
+                                }
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Text {
+                                Layout.preferredWidth: 44
+                                text: "Double"
+                                color: Utility.getAppHexColor("lightText")
+                            }
+
+                            ComboBox {
+                                id: doubleBox
+                                Layout.fillWidth: true
+                                model: actionNames
+                                onActivated: {
+                                    if (!loading) {
+                                        setSetting("btn" + btnIndex + "-double",
                                                    actionCodes[currentIndex])
                                     }
                                 }
