@@ -97,8 +97,8 @@
                 (setq last-indicate-r-state r-state)
                 (bufclear buf-light)
                 (bufset-u8 buf-light 0 state)
-                (bufset-u8 buf-light 1 l-state) ;left signal on
-                (bufset-u8 buf-light 2 r-state) ;right signal on
+                (bufset-u8 buf-light 1 l-state)
+                (bufset-u8 buf-light 2 r-state)
                 (can-send-sid light-can-id buf-light)
             )
         )
@@ -106,13 +106,8 @@
 )
 
 (defun brake-active-p ()
-    (or
-        ;(> val-brk 0.05)     ; primary brake input
-        ; add additional brake sources here as needed:
-        ; (> val-brk-2 0.05)
-        ; (= brake-switch 1)
-        (< (get-current 1) -0.05) ; optional regen / decel condition
-    )
+    ; ESC braking/regen
+    (< (get-current 1) -0.05) 
 )
 
 (defun send-brake-state ()
@@ -254,7 +249,7 @@
                     (setq battery-a-chg-time (bufget-u16 data 3))
                     (setq stats-battery-ah (/ (bufget-u16 data 5) 10.0))
             })
-            
+
             ((= id 201) {
                     (setq display-ts (systime))
                     (var drive-mode-new (bufget-u8 data 0))
@@ -407,12 +402,12 @@
 
             ((= id 40) {
                 (cond
-                        ((= (bufget-u8 data 0) 1) { ; Brake Lever Pressed
+                        ((= (bufget-u8 data 0) 1) {
                                 (setq cruise-on 0)
                                 (setq brake-lever 1)
                                 (app-adc-override 3 cruise-on)
                         })
-                        ((= (bufget-u8 data 0) 0) { ; Brake Lever Released
+                        ((= (bufget-u8 data 0) 0) {
                                 (setq brake-lever 0)
                         })
                 )
@@ -909,7 +904,7 @@
 
         (loopwhile-thd ("Brake Lever" 150) t {
                 (if (= brake-lever 1) {
-                    ;preserve braking
+                    ;preserve ESC braking
                     (app-adc-override 1 volts-brk);
                     (app-adc-override 0 0)
                     (app-adc-detach adc-detach-mode 1)

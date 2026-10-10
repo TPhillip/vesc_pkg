@@ -240,10 +240,7 @@
 ; Preview without storing, for the slider
 (defun bl-preview (v) (pwm-set-duty (setting-clamp v 0.1 1.0 settings-bl-bright) 0))
 
-(defun settings-set (name val) {
-        ; Debug: log the setting update as it is applied.
-        (print (list 'settings-set name val))
-        
+(defun settings-set (name val) {        
         (write-setting name val)
         (settings-load)
         (bl-apply)

@@ -101,8 +101,8 @@
         ((= a 8) (comm-send-event 0))
         ((= a 9) (comm-send-event 2)) ; start or stop logging on the controller
         ((= a 10) (if (< (abs stats-kmh) reverse-max-kmh) (mode-set 0)))
-        ((= a 11) (progn (setq indicate-l-on (not indicate-l-on)) (setq indicate-r-on nil))) ;toggle left indicator
-        ((= a 12) (progn (setq indicate-r-on (not indicate-r-on)) (setq indicate-l-on nil))) ;toggle right indicator
+        ((= a 11) (progn (setq indicate-l-on (not indicate-l-on)) (setq indicate-r-on nil)))
+        ((= a 12) (progn (setq indicate-r-on (not indicate-r-on)) (setq indicate-l-on nil)))
         (t nil)
 ))
 

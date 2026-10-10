@@ -78,7 +78,7 @@
                 (if (and (ix update-state state-ind) (not (icons-top-hidden))) {
                         (if (icon-on 0)
                             (if (ix state-last state-ind)
-                                (disp-render img-indicator-l 35 1 colors-yellow-icon)
+                                (disp-render img-indicator-l 35 1 colors-amber-icon)
                                 (disp-render img-indicator-l 35 1 colors-dim-icon)
                             )
                             (disp-render img-indicator-l 35 1 colors-hidden)
@@ -142,7 +142,7 @@
                 (if (and (ix update-state state-ind) (not (icons-top-hidden))) {
                         (if (icon-on 0)
                             (if (ix state-last state-ind)
-                                (disp-render img-indicator-r 170 1 colors-yellow-icon)
+                                (disp-render img-indicator-r 170 1 colors-amber-icon)
                                 (disp-render img-indicator-r 170 1 colors-dim-icon)
                             )
                             (disp-render img-indicator-r 170 1 colors-hidden)
