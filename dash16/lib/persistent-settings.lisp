@@ -277,7 +277,7 @@
             (str-from-n (if settings-batt-ramp 1 0) "%d ")
             (str-from-n settings-lever-min "%.3f ")
             (str-from-n settings-lever-max "%.3f ")
-            (str-from-n (if settings-splash 1 0) "%d")
+            (str-from-n (if settings-splash 1 0) "%d ")
             (str-from-n (ix btn-actions-double 0) "%d ")
             (str-from-n (ix btn-actions-double 1) "%d ")
 )))
